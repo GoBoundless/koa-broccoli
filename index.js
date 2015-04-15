@@ -52,7 +52,13 @@ function broccoliServer(options) {
 		reload()
 	})
 
-	return function* middleware() {
+	return function* middleware(next) {
+		yield* next
+
+		if (this.method != 'HEAD' && this.method != 'GET') return
+    // response is already handled
+    if (this.body != null || this.status != 404) return
+
 		var directory = yield watcher
 
 		yield send(this, this.path, { root: directory })
